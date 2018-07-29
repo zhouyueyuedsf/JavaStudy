@@ -1,4 +1,4 @@
-package reflex;
+package reflex.annotation;
 
 public class Test {
 

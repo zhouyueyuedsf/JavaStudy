@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="cglib-3.2.7">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/cglib-3.2.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/libs/cglib-RELEASE_3_2_7.zip!/cglib-RELEASE_3_2_7/cglib-integration-test/src/test/java" />
+      <root url="jar://$PROJECT_DIR$/libs/cglib-RELEASE_3_2_7.zip!/cglib-RELEASE_3_2_7/cglib-jmh/src/main/java" />
+      <root url="jar://$PROJECT_DIR$/libs/cglib-RELEASE_3_2_7.zip!/cglib-RELEASE_3_2_7/cglib-sample/src/main/java" />
+      <root url="jar://$PROJECT_DIR$/libs/cglib-RELEASE_3_2_7.zip!/cglib-RELEASE_3_2_7/cglib/src/main/java" />
+      <root url="jar://$PROJECT_DIR$/libs/cglib-RELEASE_3_2_7.zip!/cglib-RELEASE_3_2_7/cglib/src/test/java" />
+    </SOURCES>
+  </library>
+</component>

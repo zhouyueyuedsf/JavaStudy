@@ -1,8 +1,11 @@
-package classloader;
+package jvm;
 
 public class Object {
     public static void main(String[] args) {
-        System.out.println(Object.class);
+        int a = 1;
+        a = a++;
+        System.out.println(a);
+        //System.out.println(Object.class);
     }
 
     @Override
