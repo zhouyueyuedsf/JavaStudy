@@ -22,7 +22,7 @@ public class RunSuspend implements Continuation<Object> {
     public void resumeWith(@NotNull Object o) {
         synchronized (this) {
             this.result = result;
-            notifyAll(); // 协程已经结束，通知下面的 wait() 方法停止阻塞
+            notifyAll();
         }
     }
 
@@ -30,7 +30,7 @@ public class RunSuspend implements Continuation<Object> {
         synchronized (this) {
             while (true) {
                 Object result = this.result;
-                if (result == null) wait(); // 调用了 Object.wait()，阻塞当前线程，在 notify 或者 notifyAll 调用时返回
+                if (result == null) wait();
                 else if (result instanceof Throwable) {
                     throw (Throwable) result;
                 } else return;

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 public class Main {
 
@@ -30,6 +31,8 @@ public class Main {
             }
 
         }
-        System.out.println(B);
+        TimeZone timezone = TimeZone.getDefault();
+
+        System.out.println(timezone.getID().replace("/", "~").replace(" ", "_"));
     }
 }
