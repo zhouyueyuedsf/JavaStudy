@@ -21,49 +21,52 @@ class MyContinuation<T>(private val continuation: Continuation<T>): Continuation
         continuation.resumeWith(result)
     }
 }
+class Schedule {
+    suspend fun test1() {
+        GlobalScope.launch(MyContinuationInterceptor()) {
+            // thread1
+            log(1)
+            // 这里会有线程切换
+            val job = async {
+                // thread2
+                log(2)
+                delay(1000)
+                // 这里可能会有线程切换
+                log(3)
+                "Hello"
+            }
+            // thread1
+            log(4)
+            val result = job.await()
+            log("5. $result")
+        }.join()
+        log(6)
+    }
+
+    /**
+     * 多个线程运行时，挂起后的resume都会有线程切换
+     */
+    suspend fun test2() {
+        Executors.newFixedThreadPool(10)
+                .asCoroutineDispatcher().use { dispatcher ->
+                    GlobalScope.launch(dispatcher) {
+                        log(1)
+                        val job = async {
+                            log(2)
+                            delay(1000)
+                            log(3)
+                            "Hello"
+                        }
+                        log(4)
+                        val result = job.await()
+                        log("5. $result")
+                    }.join()
+                    log(6)
+                }
+}
 fun main() = runBlocking {
     test2()
 }
 
-suspend fun test1() {
-    GlobalScope.launch(MyContinuationInterceptor()) {
-        // thread1
-        log(1)
-        // 这里会有线程切换
-        val job = async {
-            // thread2
-            log(2)
-            delay(1000)
-            // 这里可能会有线程切换
-            log(3)
-            "Hello"
-        }
-        // thread1
-        log(4)
-        val result = job.await()
-        log("5. $result")
-    }.join()
-    log(6)
-}
 
-/**
- * 多个线程运行时，挂起后的resume都会有线程切换
- */
-suspend fun test2() {
-    Executors.newFixedThreadPool(10)
-            .asCoroutineDispatcher().use { dispatcher ->
-                GlobalScope.launch(dispatcher) {
-                    log(1)
-                    val job = async {
-                        log(2)
-                        delay(1000)
-                        log(3)
-                        "Hello"
-                    }
-                    log(4)
-                    val result = job.await()
-                    log("5. $result")
-                }.join()
-                log(6)
-            }
 }

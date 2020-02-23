@@ -2,6 +2,7 @@ package coroutine
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.NonCancellable.invokeOnCompletion
+import org.apache.tools.ant.taskdefs.Execute.launch
 import utils.MyLog.log
 import java.lang.Exception
 import kotlin.concurrent.thread
@@ -41,8 +42,7 @@ object Suspend {
         COROUTINE_SUSPENDED
     }
 
-    suspend fun returnSuspended() = suspendCoroutineUninterceptedOrReturn<String>{
-        continuation ->
+    suspend fun returnSuspended() = suspendCoroutineUninterceptedOrReturn<String> { continuation ->
         thread {
             Thread.sleep(1000)
             continuation.resume("Return suspended.")
@@ -50,7 +50,7 @@ object Suspend {
         COROUTINE_SUSPENDED
     }
 
-    suspend fun returnImmediately() = suspendCoroutineUninterceptedOrReturn<String>{
+    suspend fun returnImmediately() = suspendCoroutineUninterceptedOrReturn<String> {
         log(1)
         "Return immediately."
     }
@@ -64,10 +64,58 @@ object Suspend {
         log(returnImmediately())
         log(4)
     }
+
+    suspend fun test3() {
+        GlobalScope.launch {
+            delay(200L)
+            log("Task from runBlocking")
+        }
+        coroutineScope {
+            // 创建⼀个协程作⽤域
+            launch {
+                delay(500L)
+                log("Task from nested launch")
+            }
+            delay(100L)
+            log("Task from coroutine scope") // 这⼀⾏会在内嵌 launch 之前输出
+        }
+        // 这里是在runBlock中，阻塞了
+        log("Coroutine scope is over") // 这⼀⾏在内嵌 launch 执⾏完毕后才输出
+    }
+
+    /**
+     * 比较test4和test5的区别, 主要是在线程上的区别
+     */
+    suspend fun test4() {
+        coroutineScope {
+            launch { // launch a new coroutine in the scope of runBlocking
+                delay(1000L)
+                log("World!")
+            }
+            log("Hello,")
+        }
+    }
+
+    suspend fun test5() {
+        coroutineScope {
+            GlobalScope.launch { // launch a new coroutine in the scope of runBlocking
+                delay(1000L)
+                log("World!")
+            }
+            log("Hello,")
+        }
+    }
 }
 
 fun main() = runBlocking {
-    log(Suspend.test2())
+    repeat(100_000) { // launch a lot of coroutines
+        launch {
+            delay(1000L)
+            log(".")
+        }
+    }
 }
+
+
 
 
