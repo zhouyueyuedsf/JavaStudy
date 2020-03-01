@@ -32,7 +32,7 @@ public class Main {
 
         }
         TimeZone timezone = TimeZone.getDefault();
-
-        System.out.println(timezone.getID().replace("/", "~").replace(" ", "_"));
+        // ETC/GMT+3
+        System.out.println("ETC~GMT+3".replace("/", "~").replace(" ", "_").replace("+", "%"));
     }
 }

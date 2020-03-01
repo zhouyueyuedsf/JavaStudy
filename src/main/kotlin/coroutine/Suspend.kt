@@ -1,5 +1,6 @@
 package coroutine
 
+import coroutine.Suspend.test6
 import kotlinx.coroutines.*
 import kotlinx.coroutines.NonCancellable.invokeOnCompletion
 import org.apache.tools.ant.taskdefs.Execute.launch
@@ -9,6 +10,8 @@ import kotlin.concurrent.thread
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 
 object Suspend {
     suspend fun test1() {
@@ -105,15 +108,44 @@ object Suspend {
             log("Hello,")
         }
     }
-}
 
-fun main() = runBlocking {
-    repeat(100_000) { // launch a lot of coroutines
-        launch {
-            delay(1000L)
-            log(".")
+    suspend fun doSomethingUsefulOne(): Int {
+        delay(1000L)
+        return 13
+    }
+
+    suspend fun doSomethingUsefulTwo(): Int {
+        delay(1000L)
+        return 29
+    }
+    suspend fun test6() {
+        coroutineScope {
+            val one = async {
+                val res = doSomethingUsefulOne()
+                log(res)
+                var i = 0
+                while (i < 100) {
+                    log(++i)
+                }
+                res
+            }
+            val two = async {
+                val res = doSomethingUsefulTwo()
+                log(res)
+                var i = 0
+                while (i < 100) {
+                    log(++i)
+                }
+                res
+            }
+            log("The answer is ${one.await() + two.await()}")
         }
     }
+}
+
+@ExperimentalTime
+fun main() = runBlocking {
+    log(measureTime { test6() })
 }
 
 

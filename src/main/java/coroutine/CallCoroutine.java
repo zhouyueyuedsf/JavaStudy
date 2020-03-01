@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import utils.MyLog;
 
 /**
- * java调kotlin的协程
+ *
  */
 public class CallCoroutine {
 
