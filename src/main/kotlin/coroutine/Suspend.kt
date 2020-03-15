@@ -1,10 +1,16 @@
 package coroutine
 
+import coroutine.Suspend.test1
 import coroutine.Suspend.test6
+import coroutine.Suspend.test7
 import kotlinx.coroutines.*
 import kotlinx.coroutines.NonCancellable.invokeOnCompletion
+import org.apache.tools.ant.taskdefs.Execute
 import org.apache.tools.ant.taskdefs.Execute.launch
 import utils.MyLog.log
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileReader
 import java.lang.Exception
 import kotlin.concurrent.thread
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -16,22 +22,25 @@ import kotlin.time.measureTime
 object Suspend {
     suspend fun test1() {
         log("start")
-        val job1 = GlobalScope.launch {
-            // ①
-            log(1)
-            // 协程挂起1秒
-            try {
-                delay(1000) // ②
-            } catch (e: Exception) {
-                log("cancelled. $e")
+        coroutineScope {
+            val job1 = launch {
+                // ①
+                log(1)
+                // 协程挂起1秒
+                try {
+                    delay(1000) // ②
+                } catch (e: Exception) {
+                    log("cancelled. $e")
+                }
+                log(2)
             }
-            log(2)
+            delay(100)
+            log(3)
+            job1.cancel()
+            job1.join()
+            log(4)
         }
-        delay(100)
-        log(3)
-        job1.cancel()
-        job1.join()
-        log(4)
+
     }
 
     suspend fun hello() = suspendCoroutineUninterceptedOrReturn<Int> { continuation ->
@@ -91,7 +100,8 @@ object Suspend {
      */
     suspend fun test4() {
         coroutineScope {
-            launch { // launch a new coroutine in the scope of runBlocking
+            launch {
+                // launch a new coroutine in the scope of runBlocking
                 delay(1000L)
                 log("World!")
             }
@@ -101,7 +111,8 @@ object Suspend {
 
     suspend fun test5() {
         coroutineScope {
-            GlobalScope.launch { // launch a new coroutine in the scope of runBlocking
+            GlobalScope.launch {
+                // launch a new coroutine in the scope of runBlocking
                 delay(1000L)
                 log("World!")
             }
@@ -110,42 +121,62 @@ object Suspend {
     }
 
     suspend fun doSomethingUsefulOne(): Int {
-        delay(1000L)
+//        delay(1000L)
+        val file = File("E:\\YueyueProjects\\hindict_android.rar")
+        val bufferedReader = BufferedReader(FileReader(file))
+        while (true) {
+            bufferedReader.readLine() ?: break
+        }
         return 13
     }
 
     suspend fun doSomethingUsefulTwo(): Int {
-        delay(1000L)
+//        delay(1000L)
+        val file = File("E:\\YueyueProjects\\hindict_android.rar")
+        val bufferedReader = BufferedReader(FileReader(file))
+        while (true) {
+            bufferedReader.readLine() ?: break
+        }
         return 29
     }
+
+    /**
+     * 并发等待测试
+     */
     suspend fun test6() {
         coroutineScope {
             val one = async {
                 val res = doSomethingUsefulOne()
-                log(res)
-                var i = 0
-                while (i < 100) {
-                    log(++i)
-                }
+//                log(res)
+//                var i = 0
+//                while (i < 100) {
+//                    log(++i)
+//                }
                 res
             }
             val two = async {
                 val res = doSomethingUsefulTwo()
-                log(res)
-                var i = 0
-                while (i < 100) {
-                    log(++i)
-                }
+//                log(res)
+//                var i = 0
+//                while (i < 100) {
+//                    log(++i)
+//                }
                 res
             }
             log("The answer is ${one.await() + two.await()}")
         }
     }
+
+    suspend fun test7() {
+        val one = doSomethingUsefulOne()
+        val two = doSomethingUsefulTwo()
+        log("The answer is ${one + two}")
+    }
 }
 
 @ExperimentalTime
 fun main() = runBlocking {
-    log(measureTime { test6() })
+    test1()
 }
 
 
