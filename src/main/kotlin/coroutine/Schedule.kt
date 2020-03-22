@@ -1,5 +1,6 @@
 package coroutine
 
+import coroutine.Schedule.test1
 import kotlinx.coroutines.*
 import utils.MyLog.log
 import java.util.concurrent.Executors
@@ -9,25 +10,26 @@ import kotlin.coroutines.ContinuationInterceptor
 /**
  * 返回结果的拦截器
  */
-class MyContinuationInterceptor: ContinuationInterceptor {
+class MyContinuationInterceptor : ContinuationInterceptor {
     override val key = ContinuationInterceptor
     override fun <T> interceptContinuation(continuation: Continuation<T>) = MyContinuation(continuation)
 }
 
-class MyContinuation<T>(private val continuation: Continuation<T>): Continuation<T> {
+class MyContinuation<T>(private val continuation: Continuation<T>) : Continuation<T> {
     override val context = continuation.context
     override fun resumeWith(result: Result<T>) {
-        log("<coroutine.MyContinuation> $result" )
+        log("<coroutine.MyContinuation> $result")
         continuation.resumeWith(result)
     }
 }
-class Schedule {
+
+object Schedule {
     suspend fun test1() {
-        GlobalScope.launch(MyContinuationInterceptor()) {
+        GlobalScope.launch(start = CoroutineStart.DEFAULT, context = MyContinuationInterceptor()) {
             // thread1
             log(1)
             // 这里会有线程切换
-            val job = async {
+            val deferred = async {
                 // thread2
                 log(2)
                 delay(1000)
@@ -37,7 +39,7 @@ class Schedule {
             }
             // thread1
             log(4)
-            val result = job.await()
+            val result = deferred.await()
             log("5. $result")
         }.join()
         log(6)
@@ -63,10 +65,14 @@ class Schedule {
                     }.join()
                     log(6)
                 }
+    }
+
+
+
+
 }
+
 fun main() = runBlocking {
-    test2()
-}
-
-
+    test1()
+    log("end")
 }

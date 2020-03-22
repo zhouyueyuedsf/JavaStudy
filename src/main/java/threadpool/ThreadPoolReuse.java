@@ -30,6 +30,7 @@ public class ThreadPoolReuse {
             ThreadPoolReuse work = new ThreadPoolReuse();
             pool.execute(work.runnable);
         }
+        System.out.println("4");
         try {
             Thread.sleep(5000);
             System.out.println("wait time");
