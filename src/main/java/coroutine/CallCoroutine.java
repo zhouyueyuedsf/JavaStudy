@@ -14,24 +14,23 @@ import utils.MyLog;
 public class CallCoroutine {
 
     public static void main(String[] args) {
-        test1();
+        test3();
     }
+
+
+    private static void test3() {
+        RunSuspend runSuspend = new RunSuspend();
+        ContinuationImpl continuation = new ContinuationImpl(runSuspend);
+        continuation.resumeWith(Unit.INSTANCE);
+        try {
+            runSuspend.await();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+
     private static void test2() {
-        Object value =  Suspend.INSTANCE.test2(new Continuation<Unit>() {
-            @NotNull
-            @Override
-            public CoroutineContext getContext() {
-                return null;
-            }
-
-            @Override
-            public void resumeWith(@NotNull Object o) {
-
-            }
-        });
-    }
-    private static void test1() {
-        Object value =  Suspend.INSTANCE.hello(new Continuation<Integer>() {
+        Suspend.INSTANCE.test2(new Continuation<Unit>() {
             @NotNull
             @Override
             public CoroutineContext getContext() {
@@ -40,7 +39,24 @@ public class CallCoroutine {
 
             @Override
             public void resumeWith(@NotNull Object o) {
-                if(o instanceof Integer){
+                if (o instanceof String) {
+                    handleResult(o);
+                }
+            }
+        });
+    }
+
+    private static void test1() {
+        Object value = Suspend.INSTANCE.hello(new Continuation<Integer>() {
+            @NotNull
+            @Override
+            public CoroutineContext getContext() {
+                return EmptyCoroutineContext.INSTANCE;
+            }
+
+            @Override
+            public void resumeWith(@NotNull Object o) {
+                if (o instanceof Integer) {
                     handleResult(o);
                 } else {
                     Throwable throwable = (Throwable) o;
@@ -49,14 +65,14 @@ public class CallCoroutine {
             }
         });
 
-        if(value == IntrinsicsKt.getCOROUTINE_SUSPENDED()){
+        if (value == IntrinsicsKt.getCOROUTINE_SUSPENDED()) {
             MyLog.INSTANCE.log("Suspended.");
         } else {
             handleResult(value);
         }
     }
 
-    public static void handleResult(Object o){
+    public static void handleResult(Object o) {
         MyLog.INSTANCE.log("The result is " + o);
     }
 }

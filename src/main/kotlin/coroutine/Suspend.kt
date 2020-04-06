@@ -1,23 +1,22 @@
 package coroutine
 
-import coroutine.Suspend.test1
-import coroutine.Suspend.test6
+import coroutine.Suspend.returnSuspended
+import coroutine.Suspend.test10
+import coroutine.Suspend.test11
+import coroutine.Suspend.test12
 import coroutine.Suspend.test7
 import kotlinx.coroutines.*
-import kotlinx.coroutines.NonCancellable.invokeOnCompletion
-import org.apache.tools.ant.taskdefs.Execute
-import org.apache.tools.ant.taskdefs.Execute.launch
 import utils.MyLog.log
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
-import java.lang.Exception
 import kotlin.concurrent.thread
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+import kotlin.system.measureTimeMillis
 import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
 
 object Suspend {
     suspend fun test1() {
@@ -63,7 +62,7 @@ object Suspend {
     }
 
     suspend fun returnImmediately() = suspendCoroutineUninterceptedOrReturn<String> {
-        log(1)
+        log(5)
         "Return immediately."
     }
 
@@ -71,7 +70,7 @@ object Suspend {
         log(1)
         log(returnSuspended())
         log(2)
-        delay(1000)
+//        delay(1000)
         log(3)
         log(returnImmediately())
         log(4)
@@ -120,63 +119,170 @@ object Suspend {
         }
     }
 
-    suspend fun doSomethingUsefulOne(): Int {
-//        delay(1000L)
-        val file = File("E:\\YueyueProjects\\hindict_android.rar")
+    fun doTaskOne() {
+        val file = File("E:\\YueyueProjects\\YDLogManager.kt")
         val bufferedReader = BufferedReader(FileReader(file))
         while (true) {
             bufferedReader.readLine() ?: break
         }
-        return 13
     }
 
-    suspend fun doSomethingUsefulTwo(): Int {
-//        delay(1000L)
-        val file = File("E:\\YueyueProjects\\hindict_android.rar")
+    fun doTaskTwo() {
+        val file = File("E:\\YueyueProjects\\YDLogManager.kt")
         val bufferedReader = BufferedReader(FileReader(file))
         while (true) {
             bufferedReader.readLine() ?: break
         }
-        return 29
     }
 
     /**
      * 并发等待测试
      */
     suspend fun test6() {
-        coroutineScope {
-            val one = async {
-                val res = doSomethingUsefulOne()
-//                log(res)
-//                var i = 0
-//                while (i < 100) {
-//                    log(++i)
-//                }
-                res
+        val totalTime = measureTimeMillis {
+            coroutineScope {
+                launch(Dispatchers.Default) {
+                    val oneTask = async {
+                        log("start do Task1")
+                        val res = measureTimeMillis { doTaskOne() }
+                        res
+                    }
+                    val twoTask = async {
+                        log("start do Task2")
+                        val res = measureTimeMillis { doTaskTwo() }
+                        res
+                    }
+                    log("The answer is ${oneTask.await() + twoTask.await()}")
+                }
             }
-            val two = async {
-                val res = doSomethingUsefulTwo()
-//                log(res)
-//                var i = 0
-//                while (i < 100) {
-//                    log(++i)
-//                }
-                res
-            }
-            log("The answer is ${one.await() + two.await()}")
         }
+        log("The totalTime is $totalTime")
     }
 
     suspend fun test7() {
-        val one = doSomethingUsefulOne()
-        val two = doSomethingUsefulTwo()
-        log("The answer is ${one + two}")
+        val totalTime = measureTimeMillis {
+            coroutineScope {
+                val oneTask = async(newSingleThreadContext("dispather-1")) {
+                    log("start do Task1")
+                    val res = measureTimeMillis { doTaskOne() }
+                    log("end do Task1")
+                    res
+                }
+                val twoTask = async(newSingleThreadContext("dispather-2")) {
+                    log("start do Task2")
+                    val res = measureTimeMillis { doTaskTwo() }
+                    log("end do Task2")
+                    res
+                }
+                log("The answer is ${oneTask.await() + twoTask.await()}")
+            }
+        }
+        log("The totalTime is $totalTime")
+    }
+
+    suspend fun test10() {
+        coroutineScope {
+            val oneTask = async(newSingleThreadContext("dispather-1")) {
+                log("start do Task1")
+                val res = doTaskOne()
+                log("end do Task1")
+                res
+            }
+            val twoTask = async(newSingleThreadContext("dispather-2")) {
+                log("start do Task2")
+                val res = doTaskTwo()
+                log("end do Task2")
+                res
+            }
+            oneTask.await()
+            twoTask.await()
+            // Task3
+            (withContext(newSingleThreadContext("dispather-3")) {
+                delay(1000)
+                log("end task")
+            })
+        }
+    }
+
+    suspend fun test11() {
+        coroutineScope {
+            newSingleThreadContext("dispather-1").use { dispather1 ->
+                newSingleThreadContext("dispather-2").use { dispather2 ->
+                    val oneTask = async(dispather1) {
+                        log("start do Task1")
+                        val res = doTaskOne()
+                        log("end do Task1")
+                        delay(2000)
+                        res
+                    }
+                    val twoTask = async(dispather2) {
+                        log("start do Task2")
+                        val res = doTaskTwo()
+                        log("end do Task2")
+                        res
+                    }
+                    oneTask.await()
+                    twoTask.await()
+                    // Task3
+                    (withContext(dispather2) {
+                        delay(1000)
+                        log("end task")
+                    })
+                }
+            }
+        }
+    }
+
+    suspend fun test12() {
+        coroutineScope {
+            launch(Dispatchers.IO) {
+                val oneTask = async {
+                    log("start do Task1")
+                    val res = doTaskOne()
+                    log("end do Task1")
+                    res
+                }
+                val twoTask = async {
+                    log("start do Task2")
+                    val res = doTaskTwo()
+                    log("end do Task2")
+                    res
+                }
+                oneTask.await()
+                twoTask.await()
+                // Task3
+                (async {
+                    delay(1000)
+                    log("end task")
+                }.await())
+            }
+        }
     }
 }
 
+
+/**
+ * 回调变挂起
+ */
+suspend fun test8() =
+        suspendCoroutine<String> {
+            it.resume("test8")
+        }
+
+
+fun test9(callback: (String) -> Unit) {
+    callback.invoke("test9")
+}
+
+/**
+ * test10: 11042
+ * test11: 11038
+ * test12: 11048
+ */
 @ExperimentalTime
 fun main() = runBlocking {
-    test1()
+    log(test8())
+    log("end")
 }
 
 

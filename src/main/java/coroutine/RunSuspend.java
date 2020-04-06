@@ -9,7 +9,7 @@ import kotlinx.coroutines.DelayKt;
 import org.jetbrains.annotations.NotNull;
 import utils.MyLog;
 
-public class RunSuspend implements Continuation<Object> {
+public class RunSuspend implements Continuation<Unit> {
     private Object result;
 
     @NotNull

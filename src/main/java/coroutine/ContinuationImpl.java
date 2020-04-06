@@ -30,24 +30,24 @@ public class ContinuationImpl implements Continuation<Object> {
             switch (label) {
                 case 0: {
                     MyLog.INSTANCE.log(1);
-                    result = Suspend.INSTANCE.returnSuspended( this);
+                    result = Suspend.INSTANCE.returnSuspended(this);
                     label++;
                     if (isSuspended(result)) return;
                 }
                 case 1: {
                     MyLog.INSTANCE.log(result);
                     MyLog.INSTANCE.log(2);
-                        result = DelayKt.delay(1000, this);
+                    result = DelayKt.delay(1000, this);
                     label++;
                     if (isSuspended(result)) return;
                 }
                 case 2: {
                     MyLog.INSTANCE.log(3);
-                    result = Suspend.INSTANCE.returnImmediately( this);
+                    result = Suspend.INSTANCE.returnImmediately(this);
                     label++;
                     if (isSuspended(result)) return;
                 }
-                case 3:{
+                case 3: {
                     MyLog.INSTANCE.log(result);
                     MyLog.INSTANCE.log(4);
                 }
@@ -57,6 +57,7 @@ public class ContinuationImpl implements Continuation<Object> {
             completion.resumeWith(e);
         }
     }
+
     private boolean isSuspended(Object result) {
         return result == IntrinsicsKt.getCOROUTINE_SUSPENDED();
     }
