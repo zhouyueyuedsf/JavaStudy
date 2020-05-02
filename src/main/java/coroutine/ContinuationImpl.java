@@ -53,7 +53,7 @@ public class ContinuationImpl implements Continuation<Object> {
                 }
             }
             completion.resumeWith(Unit.INSTANCE);
-        } catch (Exception e) {
+        } catch (java.lang.Exception e) {
             completion.resumeWith(e);
         }
     }

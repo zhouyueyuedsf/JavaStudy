@@ -6,10 +6,10 @@ public class MyThread extends Thread {
         super.run();
         try {
             for (int i = 0; i < 500000; i++) {
-                // check中断标志位
+                // check interrupted flag
                 if (this.isInterrupted()) {
                     System.out.println("stop");
-                    // 异常法，使线程自行停止
+                    // exception method
                     throw new InterruptedException();
                 }
             }
