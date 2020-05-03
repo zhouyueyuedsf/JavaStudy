@@ -3,6 +3,7 @@ package coroutine
 import coroutine.Launch.test1
 import coroutine.Launch.test2
 import coroutine.Launch.test4
+import coroutine.Launch.test5
 import kotlinx.coroutines.*
 import utils.MyLog.log
 
@@ -55,9 +56,15 @@ object Launch  {
         job.join()
         log(5)
     }
+
+    suspend fun test5() {
+        List(100_000) {
+            println(it)
+        }
+    }
 }
 
 fun main() = runBlocking {
-    test4()
+    test5()
     log("end")
 }

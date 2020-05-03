@@ -1,6 +1,7 @@
 package coroutine
 
 import coroutine.ChannelExample.test7
+import coroutine.ChannelExample.test8
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.flow.collect
@@ -92,6 +93,7 @@ object ChannelExample {
         while (true) {
             // 在流中开始从 1 生产无穷多个整数
             send(x++)
+            delay(100)
         }
     }
 
@@ -155,6 +157,7 @@ object ChannelExample {
             action(index)
         }
     }
+
     /**
      * fade out
      */
@@ -166,10 +169,31 @@ object ChannelExample {
 //                    log(it)
 //                }
                 launchProcessor(it, producer)
-                log("")
             }
             delay(950)
             producer.cancel() // 取消协程生产者从而将它们全部杀死
+        }
+    }
+
+    /**
+     * fade in
+     */
+    suspend fun sendString(channel: SendChannel<String>, s: String, time: Long) {
+        while (true) {
+            delay(time)
+            channel.send(s)
+        }
+    }
+
+    suspend fun test8() {
+        coroutineScope {
+            val channel = Channel<String>()
+            launch { sendString(channel, "foo", 200L) }
+            launch { sendString(channel, "BAR!", 500L) }
+            repeat(6) { // 接收前六个
+                println(channel.receive())
+            }
+            coroutineContext.cancelChildren() // 取消所有子协程来让主协程结束
         }
     }
 }
@@ -177,6 +201,6 @@ object ChannelExample {
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
 fun main() = runBlocking {
-    test7()
+    test8()
     log("end")
 }
