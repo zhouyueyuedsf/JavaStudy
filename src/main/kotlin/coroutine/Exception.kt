@@ -1,6 +1,9 @@
 package coroutine
 
-import coroutine.Exception.test11
+import coroutine.Exception.test12
+import coroutine.Exception.test13
+import coroutine.Exception.test8
+import coroutine.Exception.test9_1
 import kotlinx.coroutines.*
 import utils.MyLog.log
 import java.io.IOException
@@ -150,10 +153,8 @@ object Exception {
                 }
             }.join()
 
-            GlobalScope.launch(handler) {
-                async {
-                    throw AssertionError()
-                }
+            GlobalScope.async(handler) {
+                throw AssertionError()
             }.join()
         }
     }
@@ -169,9 +170,14 @@ object Exception {
 
     suspend fun test9_1() {
         coroutineScope {
-            launch(newSingleThreadContext("")) {
-                throw IOException()
+            try {
+                launch(newSingleThreadContext("")) {
+                    throw IOException()
+                }
+            } catch (e: Throwable) {
+                log(e)
             }
+
         }
     }
 
@@ -251,9 +257,64 @@ object Exception {
             log("4 $e")
         }
     }
+
+    suspend fun test12() {
+        log(1)
+        try {
+            coroutineScope {// 1
+                log(2)
+                launch() {// 2
+                    log(3)
+                    launch() {// 3
+                        log(4)
+                        delay(100)
+                        throw IOException("Hey!!")
+                    }
+                    log(5)
+                }
+                log(6)
+                val job = launch {// 4
+                    log(7)
+                    delay(1000)
+                }
+                try {
+                    log(8)
+                    job.join()
+                    log("9")
+                } catch (e: Throwable) {
+                    log("10. $e")
+                }
+            }
+            log(11)
+        } catch (e: Throwable) {
+            log("12. $e")
+        }
+        log(13)
+    }
+
+    suspend fun test13() {
+        log(1)
+        try {
+            supervisorScope {
+                try {
+                    launch { // ③
+                        log(2)
+                        delay(100)
+                        throw IOException("Hey!!")
+                    }
+                } catch (e: Throwable) {
+                    log(e)
+                }
+            }
+            log(3)
+        } catch (e: Throwable) {
+            log("4. $e")
+        }
+        log(5)
+    }
 }
 
 fun main() = runBlocking {
-    test11()
+    test12()
     log("end")
 }
