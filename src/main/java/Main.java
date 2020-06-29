@@ -1,3 +1,7 @@
+import kotlin.Unit;
+import kotlin.jvm.functions.Function2;
+import lambda.LambdaDemo;
+
 import java.util.ArrayList;
 import java.util.TimeZone;
 
@@ -34,5 +38,6 @@ public class Main {
         TimeZone timezone = TimeZone.getDefault();
         // ETC/GMT+3
         System.out.println("ETC~GMT+3".replace("/", "~").replace(" ", "_").replace("+", "%"));
+        LambdaDemo.INSTANCE.max("1", "2", (s, s2) -> Unit.INSTANCE);
     }
 }

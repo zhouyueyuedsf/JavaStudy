@@ -18,14 +18,15 @@ object LambdaDemo {
         intPlus(1, 2)
     }
 
-    fun max(v1: String, v2: String, comparetor: (String, String) -> Boolean): Boolean {
-        return comparetor(v1, v2)
+    inline fun max(v1: String, v2: String, crossinline comparetor: (String, String) -> Unit): Boolean {
+        comparetor.invoke(v1, v2)
+        return true
     }
 
     fun test2() {
         max("123", "234") { a, b ->
             // comparetor
-            a.length < b.length
+//            a.length < b.length
         }
     }
 

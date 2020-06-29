@@ -2,11 +2,14 @@ package coroutine
 
 import coroutine.Exception.test12
 import coroutine.Exception.test13
+import coroutine.Exception.test14
 import coroutine.Exception.test8
 import coroutine.Exception.test9_1
 import kotlinx.coroutines.*
 import utils.MyLog.log
 import java.io.IOException
+import java.util.concurrent.TimeoutException
+import kotlin.Exception
 
 object Exception {
     suspend fun test1() {
@@ -312,9 +315,23 @@ object Exception {
         }
         log(5)
     }
+
+    suspend fun test14() {
+        coroutineScope {
+            try {
+                withContext (Dispatchers.IO) {
+                    withTimeout(100) {
+                        delay(1000)
+                    }
+                }
+            } catch (e: Exception) {
+                log(e)
+            }
+        }
+    }
 }
 
 fun main() = runBlocking {
-    test12()
+    test14()
     log("end")
 }
