@@ -39,6 +39,6 @@ public class ClassProxy {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        return object;
+        return object;S
     }
 }

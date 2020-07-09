@@ -30,7 +30,7 @@ public class ContinuationImpl implements Continuation<Object> {
             switch (label) {
                 case 0: {
                     MyLog.INSTANCE.log(1);
-                    result = Suspend.INSTANCE.returnSuspended(this);
+                    result = Suspend.INSTANCE.hello(this);
                     label++;
                     if (isSuspended(result)) return;
                 }
@@ -52,7 +52,7 @@ public class ContinuationImpl implements Continuation<Object> {
                     MyLog.INSTANCE.log(4);
                 }
             }
-            completion.resumeWith(Unit.INSTANCE);
+            completion.resumeWith(result);
         } catch (java.lang.Exception e) {
             completion.resumeWith(e);
         }

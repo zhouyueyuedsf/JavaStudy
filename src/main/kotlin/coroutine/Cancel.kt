@@ -3,6 +3,7 @@ package coroutine
 import coroutine.Cancel.test1
 import coroutine.Cancel.test2
 import coroutine.Cancel.test3
+import coroutine.Cancel.test5
 import kotlinx.coroutines.*
 import utils.MyLog.log
 import java.io.BufferedReader
@@ -30,6 +31,31 @@ object Cancel {
             log("main: I'm tired of waiting!")
             job.cancelAndJoin() // 取消该作业并且等待它结束
             log("main: Now I can quit.")
+        }
+    }
+
+    suspend fun readFile() = suspendCancellableCoroutine<Unit> { cont ->
+        var existed = true
+        cont.invokeOnCancellation {
+            log("start cancel")
+            existed = false
+        }
+        val file = File("E:\\Opera_64.0.3417.54_Setup_x64.exe")
+        val bufferedReader = BufferedReader(FileReader(file))
+        while (existed) {
+            log(1)
+            bufferedReader.readLine() ?: break
+        }
+        log("cancelled")
+    }
+
+    suspend fun test5() {
+        coroutineScope {
+            val job = launch {
+                readFile()
+            }
+            delay(100L)
+            job.cancel()
         }
     }
 
@@ -74,12 +100,11 @@ object Cancel {
     suspend fun test4() = suspendCancellableCoroutine<String> { cont ->
         // 定义一个取消回调事件
         cont.invokeOnCancellation {
-
         }
     }
 }
 
 fun main(args: Array<String>) = runBlocking {
-    test2()
+    test5()
     log("end")
 }
