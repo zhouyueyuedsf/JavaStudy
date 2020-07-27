@@ -6,5 +6,5 @@ package basic
  */
 
 fun main() {
-    println(LangProvider.ENGLISH)
+//    println(LangProvider.ENGLISH)
 }
