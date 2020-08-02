@@ -30,7 +30,7 @@ public class RunPlan {
 
     public static void main(String[] args) {
         try {
-            f1();
+            inc();
         } catch (Exception e) {
             e.printStackTrace();
         }
