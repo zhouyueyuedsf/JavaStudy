@@ -18,28 +18,30 @@ object LambdaDemo {
         intPlus(1, 2)
     }
 
-    inline fun max(v1: String, v2: String, crossinline comparetor: (String, String) -> Unit): Boolean {
-        comparetor.invoke(v1, v2)
-        return true
+    inline fun max(v1: String, v2: String, crossinline comparetor: (String, String) -> Boolean): Boolean {
+        return comparetor.invoke(v1, v2)
     }
 
     fun test2() {
-        max("123", "234") { a, b ->
-            // comparetor
-//            a.length < b.length
-        }
+//        max("123", "234") { a, b ->
+//            // comparetor
+////            a.length < b.length
+//        }
     }
 
 //    a(fun b(param: Int): String {
 //        return param.toString()
 //    })
 
-    val d = fun(param: Int): String = param.toString()
+    val toString = fun(param: Int): String {
+        return param.toString()
+    }
 
     inline fun <reified T> Gson.fromJson(json: String) =
             fromJson(json, T::class.java)
 
     fun testFold() {
+        toString(1)
         val items = listOf(1, 2, 3, 4, 5)
 
         // Lambdas 表达式是花括号括起来的代码块。
@@ -63,10 +65,57 @@ object LambdaDemo {
     }
 
     fun testSiteLog() {
+        log.filter { it.os == OS.WINDOWS }.map { it.duration }.average()
         val time1 = log.filter { it.os == OS.WINDOWS }.map(SiteVisit::duration).average()
         val time2 = log.averageDurationFor {
             it.os == OS.ANDROID
         }
+    }
+
+    // 比较匿名函数与labmda表达式的区别
+    fun testNmhs() {
+        max("123", "234") { a: String, b: String ->
+            a.length < b.length
+        }
+        max("123", "234", fun(a: String, b: String): Boolean {
+            return a.length < b.length
+        })
+        max("123", "234", fun(a, b) = a.length < b.length)
+    }
+
+    fun compare(a: String) { a.length < 0 }
+
+    inline fun ifNotZero(f1: (String) -> Unit) {
+        f1.invoke("123")
+    }
+
+    fun testsmh() {
+        ifNotZero(this::compare)
+    }
+    val age = Person::age
+    fun testLambda() {
+        val sum = { x: Int, y: Int -> x + y }
+        val s = sum(1, 2)
+        max("123", "234", { a: String, b: String ->
+            a.length < b.length
+        })
+        // lambda表达式可以卸载末尾
+        max("123", "234") { a: String, b: String ->
+            a.length < b.length
+        }
+        // String类型可以推断
+        max("123", "234") { a, b ->
+            a.length < b.length
+        }
+        // lambda字面值表示
+        val compare = { a: String, b: String -> a.length < b.length }
+        max("123", "234", compare)
+    }
+
+    fun testAnonymousFunction() {
+        // 将函数作为局部变量
+        val fun1 = fun(x: Int, y: Int): Int = x + y
+        fun1(1, 2)
     }
 }
 
@@ -76,6 +125,7 @@ fun <T, R> Collection<T>.fold(
 ): R {
     var accumulator: R = initial
     for (element: T in this) {
+        combine.invoke(accumulator, element)
         accumulator = combine(accumulator, element)
     }
     return accumulator
@@ -104,6 +154,7 @@ val log = listOf(SiteVisit("/", 34.0, OS.WINDOWS),
 /**
  * 针对特定的平台log统计抽象的一个函数
  */
+val mDuration = SiteVisit::duration
 fun List<SiteVisit>.averageDurationFor(os: OS) = filter { it.os == os }.map(transform = SiteVisit::duration).average()
 
 /**
@@ -117,7 +168,87 @@ fun List<SiteVisit>.averageDurationFor(predicate: (SiteVisit) -> Boolean) =
                 .map(SiteVisit::duration)
                 .average()
 
+data class Person(val name: String, val age: Int)
+
+val people = listOf(Person("Alice", 29), Person("Bob", 31))
+fun lookForAlice(people: List<Person>) {
+    for (person in people) {
+        if (person.name == "Alice") {
+            println("Found")
+            return
+        }
+    }
+    println("Alice is not found")
+}
+// 换成foreach
+fun lookForAlice2(people: List<Person>) {
+    // 局部返回方案
+    // forEach 接受一个lambda函数
+    people.forEach { person ->
+        if (person.name == "Alice") {
+            println("Found")
+            return@forEach
+        }
+        println("Alice is not found")
+    }
+
+    // 匿名函数局部返回
+    println("匿名函数实验开始")
+    people.forEach(fun(person) {
+        if (person.name == "Alice") {
+            println("Found")
+            return
+        }
+        println("Alice is not found")
+    })
+    println("匿名函数实验结束")
+    // forEach 接受一个lambda函数
+    people.forEach { person ->
+        if (person.name == "Alice") {
+            println("Found")
+            // 内联+lambda 实现了非局部返回
+            return
+        }
+        println("Alice is not found")
+    }
+}
+
+fun sendEmail(person: Person, message: String) {}
+val action = { person: Person, message: String ->
+    sendEmail(person, message)
+}
+val nextAction = ::action
+fun Person.isAdult() = age >= 21
+
+/**
+ * 带有接收者的函数字面值
+ */
+
+val sum: Int.(Int) -> Int = { other -> this.plus(other) }
+
+class HTML {
+    fun body() {
+
+    }
+}
+typealias IntFunction = Int.(Int) -> Int
+
+fun html(init: HTML.() -> Unit): HTML {
+//    val sum: Int.(Int) -> Int = { other -> plus(other) }
+    val html = HTML()  // 创建接收者对象
+    html.init()        // 将该接收者对象传给该 lambda
+    return html
+}
+
 fun main() {
-    LambdaDemo.testFold()
-    intFunction.invoke(1)
+
+    lookForAlice2(people)
+    nextAction.invoke()
+//    nextAction(Person("12", 1), "")
+    val predicate = Person::isAdult
+//    LambdaDemo.testFold()
+//    intFunction.invoke(1)
+    html {       // 带接收者的 lambda 由此开始
+        body()   // 调用该接收者对象的一个方法
+    }
 }

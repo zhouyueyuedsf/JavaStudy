@@ -1,7 +1,9 @@
 import candy.NullTestKt;
+import kotlin.jvm.functions.Function2;
+import lambda.LambdaDemoKt;
 
 import java.util.ArrayList;
-import java.util.TimeZone;
+import java.util.List;
 
 public class Main {
 
@@ -37,6 +39,7 @@ public class Main {
 //        TimeZone timezone = TimeZone.getDefault();
 //        // ETC/GMT+3
 //        System.out.println("ETC~GMT+3".replace("/", "~").replace(" ", "_").replace("+", "%"));
-//
+
     }
+
 }
