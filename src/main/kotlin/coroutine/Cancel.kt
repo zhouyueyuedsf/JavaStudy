@@ -2,14 +2,6 @@ package coroutine
 
 import coroutine.Cancel.test1
 import coroutine.Cancel.test1_1
-import coroutine.Cancel.test1_2
-import coroutine.Cancel.test1_3
-import coroutine.Cancel.test1_4
-import coroutine.Cancel.test1_5
-import coroutine.Cancel.test2
-import coroutine.Cancel.test3
-import coroutine.Cancel.test4
-import coroutine.Cancel.test5
 import kotlinx.coroutines.*
 import utils.MyLog.log
 import java.io.BufferedReader
@@ -17,6 +9,7 @@ import java.io.File
 import java.io.FileReader
 import kotlin.Exception
 import kotlin.IllegalArgumentException
+import kotlin.coroutines.CoroutineContext
 
 object Cancel {
 
@@ -101,17 +94,20 @@ object Cancel {
     @ExperimentalStdlibApi
     suspend fun test1_1() {
         coroutineScope {
-            log("main context Dispatcher = " + this.coroutineContext[CoroutineDispatcher])
+//            log("main context Dispatcher = " + this.coroutineContext[CoroutineDispatcher])
             val scope = CoroutineScope(Job() + this.coroutineContext)
-            scope.launch(Dispatchers.Default) parent@{
-                log("parent context Dispatcher = " + this.coroutineContext[CoroutineDispatcher])
-                log("parent context Job = " + this.coroutineContext[Job])
-                scope.launch (Dispatchers.IO) {
+            scope.launch parent@{
+                log("parent context = " + this.coroutineContext)
+                log("parent coroutine context Dispatcher = " + this.coroutineContext[CoroutineDispatcher])
+//                log("parent coroutine context Job = " + this.coroutineContext[Job])
+                scope.launch(Dispatchers.IO) {
+                    log("child context = " + this.coroutineContext)
                     log("child context Dispatcher = " + this.coroutineContext[CoroutineDispatcher])
-                    log("child context Job = " + this.coroutineContext[Job])
+//                    log("parent coroutine context Dispatcher = ${this@parent.coroutineContext[CoroutineDispatcher]}" )
+//                    log("child context Job = " + this.coroutineContext[Job])
                 }.join()
-                log("parent context Dispatcher = " + this.coroutineContext[CoroutineDispatcher])
-                log("parent context Job = " + this.coroutineContext[Job])
+//                log("parent coroutine context Dispatcher = " + this.coroutineContext[CoroutineDispatcher])
+//                log("parent coroutine context Job = " + this.coroutineContext[Job])
             }.join()
         }
     }
@@ -234,6 +230,6 @@ var mCont: CancellableContinuation<String>? = null
 
 @ExperimentalStdlibApi
 fun main(args: Array<String>) = runBlocking(CoroutineName("Main")) {
-    test1_5()
+    test1_1()
     log("end")
 }
