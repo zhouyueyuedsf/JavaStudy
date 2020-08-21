@@ -39,7 +39,7 @@ object Suspend {
 
     }
 
-    suspend fun hello() = suspendCoroutineUninterceptedOrReturn<Int> { continuation ->
+    suspend fun creatToken() = suspendCoroutineUninterceptedOrReturn<Int> { continuation ->
         log(1)
         thread {
             Thread.sleep(1000)

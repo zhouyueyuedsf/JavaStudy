@@ -96,12 +96,14 @@ object Launch {
     suspend fun postItem(item: Item) {
         coroutineScope {
             val job = launch(context = MyContinuationInterceptor()) {
+                log("run requestToken")
                 val token = requestToken()
+                log("run createPost")
                 val post = createPost(token, item)
                 log("run processPost")
                 processPost(post)
             }
-            job.cancel()
+            job.cancelAndJoin()
         }
     }
 }

@@ -3,15 +3,19 @@ package coroutine
 import coroutine.Exception.test12
 import coroutine.Exception.test13
 import coroutine.Exception.test14
+import coroutine.Exception.test15
 import coroutine.Exception.test8
 import coroutine.Exception.test9_1
 import kotlinx.coroutines.*
 import utils.MyLog.log
 import java.io.IOException
+import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
 import java.util.concurrent.TimeoutException
 import kotlin.Exception
 
 object Exception {
+    @ObsoleteCoroutinesApi
     suspend fun test1() {
         try {
             coroutineScope {
@@ -319,7 +323,7 @@ object Exception {
     suspend fun test14() {
         coroutineScope {
             try {
-                withContext (Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     withTimeout(100) {
                         delay(1000)
                     }
@@ -329,9 +333,27 @@ object Exception {
             }
         }
     }
+
+    suspend fun test15() {
+        val handler = CoroutineExceptionHandler { coroutinContext, exception ->
+            log("handler exception $exception")
+        }
+        val scope = CoroutineScope(handler)
+        scope.launch {
+            val deferred = async {
+                delay(1000)
+                throw IllegalStateException()
+            }
+            try {
+                deferred.await()
+            } catch (e: Exception) {
+                log("catch a exception $e")
+            }
+        }.join()
+    }
 }
 
 fun main() = runBlocking {
-    test14()
+    test15()
     log("end")
 }

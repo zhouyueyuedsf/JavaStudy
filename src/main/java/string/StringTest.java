@@ -9,5 +9,9 @@ public class StringTest {
         String s3 = "12345678";
         System.out.println(s3.length());
         System.out.println(s3.substring(0, 8));
+
+        Integer integer1 = 1;
+        Integer integer2 = 1;
+        System.out.println(integer1 == integer2);
     }
 }

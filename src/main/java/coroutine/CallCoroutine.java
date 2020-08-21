@@ -47,7 +47,7 @@ public class CallCoroutine {
     }
 
     private static void test1() {
-        Object value = Suspend.INSTANCE.hello(new Continuation<Integer>() {
+        Object value = Suspend.INSTANCE.creatToken(new Continuation<Integer>() {
             @NotNull
             @Override
             public CoroutineContext getContext() {

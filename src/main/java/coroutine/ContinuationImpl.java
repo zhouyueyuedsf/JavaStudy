@@ -30,7 +30,7 @@ public class ContinuationImpl implements Continuation<Object> {
             switch (label) {
                 case 0: {
                     MyLog.INSTANCE.log(1);
-                    result = Suspend.INSTANCE.hello(this);
+                    result = Suspend.INSTANCE.creatToken(this);
                     label++;
                     if (isSuspended(result)) return;
                 }

@@ -2,6 +2,9 @@ package coroutine
 
 import coroutine.Cancel.test1
 import coroutine.Cancel.test1_1
+import coroutine.Cancel.test2
+import coroutine.Cancel.test3
+import coroutine.Cancel.test6
 import kotlinx.coroutines.*
 import utils.MyLog.log
 import java.io.BufferedReader
@@ -182,7 +185,7 @@ object Cancel {
         coroutineScope {
             val job = launch(Dispatchers.Default) {
                 log("1")
-                val file = File("E:\\Opera_64.0.3417.54_Setup_x64.exe")
+                val file = File("D:\\software\\YoudaoMeet.exe")
                 val bufferedReader = BufferedReader(FileReader(file))
                 while (isActive) {
                     bufferedReader.readLine() ?: break
@@ -224,12 +227,32 @@ object Cancel {
         mCont = cont
 //        cont.cancel()
     }
+
+    suspend fun test6() {
+        val job = GlobalScope.launch {
+            repeat(1000) { i ->
+                log("job: I'm sleeping $i ...")
+                delay(500L)
+            }
+        }
+//            val job2 = launch {
+//                repeat(1000) { i ->
+//                    log("job2: I'm sleeping $i ...")
+//                    delay(500L)
+//                }
+//            }
+//        delay(1300L) // 延迟一段时间
+//            log("main: I'm tired of waiting!")
+        job.cancel() // 取消该作业
+//        job.join() // 等待作业执行结束
+        log("main: Now I can quit.")
+    }
 }
 
 var mCont: CancellableContinuation<String>? = null
 
 @ExperimentalStdlibApi
 fun main(args: Array<String>) = runBlocking(CoroutineName("Main")) {
-    test1_1()
+    test2()
     log("end")
 }
