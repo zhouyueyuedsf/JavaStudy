@@ -5,7 +5,6 @@ import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlin.coroutines.EmptyCoroutineContext;
 import kotlin.coroutines.intrinsics.IntrinsicsKt;
-import kotlinx.coroutines.DelayKt;
 import org.jetbrains.annotations.NotNull;
 import utils.MyLog;
 
@@ -30,26 +29,22 @@ public class ContinuationImpl implements Continuation<Object> {
             switch (label) {
                 case 0: {
                     MyLog.INSTANCE.log(1);
-                    result = Suspend.INSTANCE.creatToken(this);
+                    result = Suspend.INSTANCE.createToken(this);
                     label++;
                     if (isSuspended(result)) return;
                 }
                 case 1: {
                     MyLog.INSTANCE.log(result);
                     MyLog.INSTANCE.log(2);
-                    result = DelayKt.delay(1000, this);
+                    result = Suspend.INSTANCE.createPost((Token) result, this);
                     label++;
                     if (isSuspended(result)) return;
                 }
                 case 2: {
-                    MyLog.INSTANCE.log(3);
-                    result = Suspend.INSTANCE.returnImmediately(this);
+                    result = Suspend.INSTANCE.processPost(this);
+                    MyLog.INSTANCE.log("returnImmediately");
                     label++;
                     if (isSuspended(result)) return;
-                }
-                case 3: {
-                    MyLog.INSTANCE.log(result);
-                    MyLog.INSTANCE.log(4);
                 }
             }
             completion.resumeWith(result);

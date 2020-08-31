@@ -39,16 +39,29 @@ object Suspend {
 
     }
 
-    suspend fun creatToken() = suspendCoroutineUninterceptedOrReturn<Int> { continuation ->
-        log(1)
+    suspend fun createToken() = suspendCoroutineUninterceptedOrReturn<Token> { continuation ->
+        log("createToken start")
         thread {
             Thread.sleep(1000)
-            log(2)
-            continuation.resume(1024)
+            log("createToken return")
+            continuation.resume(Token())
         }
-        log(3)
+        log("createToken suspend")
         COROUTINE_SUSPENDED
     }
+
+
+    suspend fun createPost(token: Token) = suspendCoroutineUninterceptedOrReturn<Post> { continuation ->
+        log("createPost start")
+        thread {
+            Thread.sleep(1000)
+            log("createPost return")
+            continuation.resume(Post())
+        }
+        log("createPost suspend")
+        COROUTINE_SUSPENDED
+    }
+
 
     suspend fun returnSuspended() = suspendCoroutineUninterceptedOrReturn<String> { continuation ->
         thread {
@@ -58,8 +71,8 @@ object Suspend {
         COROUTINE_SUSPENDED
     }
 
-    suspend fun returnImmediately() = suspendCoroutineUninterceptedOrReturn<String> {
-        log(5)
+    suspend fun processPost() = suspendCoroutineUninterceptedOrReturn<String> {
+        log("processPost start")
         "Return immediately."
     }
 
@@ -69,7 +82,7 @@ object Suspend {
         log(2)
 //        delay(1000)
         log(3)
-        log(returnImmediately())
+        log(processPost())
         log(4)
     }
 
@@ -269,6 +282,14 @@ suspend fun test8() =
 
 fun test9(callback: (String) -> Unit) {
     callback.invoke("test9")
+}
+
+suspend fun test10() {
+    coroutineScope {
+        launch(Dispatchers.IO) {
+
+        }
+    }
 }
 
 /**
