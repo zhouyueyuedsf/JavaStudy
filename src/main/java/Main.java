@@ -8,7 +8,9 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        NullTestKt.f1(null);
+//        NullTestKt.f1(null);
+        String str = "严";
+        System.out.println(str.charAt(0));
 //        char[] A= {'a','b','E','C','g'};
 //        int maxKey = 'Z';
 //

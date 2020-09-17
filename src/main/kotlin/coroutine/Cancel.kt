@@ -5,6 +5,7 @@ import coroutine.Cancel.test1_1
 import coroutine.Cancel.test2
 import coroutine.Cancel.test3
 import coroutine.Cancel.test6
+import coroutine.Cancel.test7
 import kotlinx.coroutines.*
 import utils.MyLog.log
 import java.io.BufferedReader
@@ -247,12 +248,29 @@ object Cancel {
 //        job.join() // 等待作业执行结束
         log("main: Now I can quit.")
     }
+
+    suspend fun test7() {
+        coroutineScope {
+            val handlerException = CoroutineExceptionHandler { _, e ->
+                log("test7 handler $e")
+            }
+            val scope = CoroutineScope(Job() + Dispatchers.IO)
+            try {
+                scope.launch(handlerException) {
+                    delay(2000)
+                    throw IllegalArgumentException()
+                }.join()
+            } catch (e: Exception) {
+                log("test7 handle $e")
+            }
+        }
+    }
 }
 
 var mCont: CancellableContinuation<String>? = null
 
 @ExperimentalStdlibApi
 fun main(args: Array<String>) = runBlocking(CoroutineName("Main")) {
-    test2()
+    test7()
     log("end")
 }
