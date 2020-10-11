@@ -1,5 +1,6 @@
 package datastructure;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,9 +32,12 @@ public class HashMapStudy {
         linkedHashMap.forEach((key, value) -> {
             System.out.println("linked map after access " + value);
         });
-        int a = 0;
-        if ((a = (6)) == 0) {
-
-        }
+        String s = "hash code test";
+        String s1 = "hash code test1";
+        System.out.println(s.hashCode());
+        System.out.println(s1.hashCode());
+        HashMapStudy hashMapStudy = new HashMapStudy();
+        System.out.println(hashMapStudy);
+        System.out.println(hashMapStudy.hashCode());
     }
 }
