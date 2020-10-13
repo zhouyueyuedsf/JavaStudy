@@ -1,4 +1,5 @@
 import candy.NullTestKt;
+import keys.Final1;
 import kotlin.jvm.functions.Function2;
 import lambda.LambdaDemoKt;
 
@@ -11,6 +12,7 @@ public class Main {
 //        NullTestKt.f1(null);
         String str = "严";
         System.out.println(str.charAt(0));
+        Final1 final1 = new Final1();
 //        char[] A= {'a','b','E','C','g'};
 //        int maxKey = 'Z';
 //

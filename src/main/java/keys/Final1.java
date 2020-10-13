@@ -1,7 +1,7 @@
 package keys;
 
 public class Final1 {
-
+    protected String v1 = "";
     final String fs;
     public Final1(){
         fs = "123";

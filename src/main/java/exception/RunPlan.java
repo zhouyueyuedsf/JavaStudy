@@ -1,5 +1,7 @@
 package exception;
 
+import java.io.IOException;
+
 public class RunPlan {
     public static int inc() throws Exception{
         int x;
@@ -28,11 +30,41 @@ public class RunPlan {
         throw new IllegalArgumentException("");
     }
 
-    public static void main(String[] args) {
+
+    private static void test1() {
         try {
-            inc();
+            throw new RuntimeException();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("throw ");
         }
+    }
+
+    public static void test2() {
+        try {
+            throw new IllegalArgumentException();
+        } catch (Exception e) {
+            System.out.println("exception" + e);
+        } finally {
+            System.out.println("exception finally");
+        }
+    }
+
+    public static void test3() {
+        try {
+            throw new IllegalArgumentException();
+        } catch (Exception e) {
+
+        }
+        System.out.println("ex");
+    }
+
+    public static void main(String[] args) {
+//        try {
+//            inc();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        test3();
     }
 }
