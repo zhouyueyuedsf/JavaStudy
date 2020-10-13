@@ -1,4 +1,4 @@
 package typedismiss;
 
-public class Melon {
+public class Melon extends Fruit {
 }
