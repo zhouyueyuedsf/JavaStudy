@@ -23,4 +23,11 @@ fun main() {
     for (f in IntArithmetics.values()) {
         println("$f($a, $b) = ${f.applyAsInt(a, b)}")
     }
+    var index = 0;
+    var textsLen = 2
+    println(index++ % textsLen)
+    println(index++ % textsLen)
+    println(index++ % textsLen)
+    println(index++ % textsLen)
+    println(index++ % textsLen)
 }

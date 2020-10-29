@@ -1,6 +1,7 @@
 package typedismiss;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class TypeDismissStudy<T> {
@@ -32,5 +33,19 @@ public class TypeDismissStudy<T> {
 
     public static void test3(List<Object> objects) {
 
+    }
+
+    public static void test4(Object object) {
+        boolean b = object instanceof List;
+    }
+
+    public static void printSum(Collection<?> c) {
+        List<Integer> list = (List<Integer>)c;
+    }
+
+    public static void printSum2(Collection<Integer> c) {
+//        if (c instanceof List<Integer>) {
+//
+//        }
     }
 }
