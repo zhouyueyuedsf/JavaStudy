@@ -29,4 +29,7 @@ fun test1(): Unit {
 
 fun main() {
 //    println(LangProvider.ENGLISH)
+    var res: Int? = null
+    val r = res?.let { 1 } ?: 2
+    print(r)
 }

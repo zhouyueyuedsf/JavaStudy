@@ -4,11 +4,14 @@ import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterF
 import coroutine.Interrupt.test1
 import coroutine.Interrupt.test2
 import coroutine.Interrupt.test3
+import coroutine.Interrupt.test4
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import retrofit2.converter.gson.GsonConverterFactory
 import utils.MyLog.log
 import java.lang.Exception
 import kotlinx.coroutines.runBlocking
+import java.time.Instant
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -54,6 +57,27 @@ object Interrupt {
         }
     }
 
+    suspend fun test4() {
+        coroutineScope {
+            val channel = Channel<Int>()
+            val job1 = launch {
+                delay(5200)
+                channel.send(1)
+            }
+
+            val job2 = launch {
+                delay(5300)
+                channel.send(2)
+            }
+            log("find start ${Instant.now()}")
+            val find = withTimeoutOrNull(2000L) {
+                channel.receive()
+            }
+            log("find end ${Instant.now()}")
+            log("find = $find")
+        }
+    }
+
     fun test1() {
         GlobalScope.launch {
             log(1)
@@ -74,7 +98,7 @@ object Interrupt {
 
 fun main() = runBlocking {
     try {
-        log(test3())
+        log(test4())
     } catch (e: Exception) {
         log(e.message)
     }

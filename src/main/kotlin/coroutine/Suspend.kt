@@ -292,6 +292,13 @@ suspend fun test10() {
     }
 }
 
+suspend fun test11() {
+    coroutineScope {
+        log(3)
+    }
+    log(2)
+}
+
 /**
  * test10: 11042
  * test11: 11038
@@ -299,7 +306,7 @@ suspend fun test10() {
  */
 @ExperimentalTime
 fun main() = runBlocking {
-    log(test8())
+    log(test11())
     log("end")
 }
 
