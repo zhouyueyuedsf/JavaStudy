@@ -4,9 +4,16 @@ import coroutine.Exception.test12
 import coroutine.Exception.test13
 import coroutine.Exception.test14
 import coroutine.Exception.test15
+import coroutine.Exception.test16
+import coroutine.Exception.test17
+import coroutine.Exception.test18
+import coroutine.Exception.test19
+import coroutine.Exception.test20
+import coroutine.Exception.test21
 import coroutine.Exception.test8
 import coroutine.Exception.test9_1
 import kotlinx.coroutines.*
+import org.apache.tools.ant.taskdefs.Sleep
 import utils.MyLog.log
 import java.io.IOException
 import java.lang.IllegalArgumentException
@@ -351,9 +358,162 @@ object Exception {
             }
         }.join()
     }
+
+    suspend fun test16() {
+        try {
+            supervisorScope {
+                // 启动第一个子作业——这个示例将会忽略它的异常（不要在实践中这么做！）
+                val firstChild = launch(CoroutineExceptionHandler { _, _ -> }) {
+                    log("The first child is failing")
+                    throw AssertionError("The first child is cancelled")
+                }
+                // 启动第二个子作业
+                val secondChild = launch {
+//                    firstChild.join()
+                    // 取消了第一个子作业且没有传播给第二个子作业
+                    log("The first child is cancelled: ${firstChild.isCancelled}, but the second one is still active")
+                    try {
+                        delay(2000)
+                    } catch (e: Exception) {
+                        log("exception $e")
+                    } finally {
+                        // 但是取消了监督的传播
+                        log("The second child is cancelled because the supervisor was cancelled")
+                    }
+                }
+                // 等待直到第一个子作业失败且执行完成
+                firstChild.join()
+                println("Cancelling the supervisor")
+                secondChild.join()
+            }
+        } catch (e: Exception) {
+            log(e)
+        }
+    }
+
+    suspend fun test17() {
+        try {
+            supervisorScope {
+                val coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+                    log("$throwable")
+                }
+                val job1 = launch(coroutineExceptionHandler) {
+                    try {
+                        withTimeout(100) {
+                            delay(1000)
+                        }
+                    } catch (e: Exception) {
+                        throw IllegalArgumentException()
+                    }
+                    log("job1_1 can't go to run")
+                }
+                val job2 = launch(coroutineExceptionHandler) {
+                    delay(3000)
+                    log("job1_2 go to run")
+                }
+                job1.join()
+                job2.join()
+                launch {
+                    delay(5000)
+                    log("job2_1 go to run")
+                }
+            }
+        } catch (e: Exception) {
+            log("catch exception $e")
+        }
+    }
+
+    suspend fun test18() {
+        supervisorScope {
+            val coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+                log("handler $throwable")
+            }
+            with(this + Dispatchers.IO + coroutineExceptionHandler) {
+                launch {
+                    delay(1000)
+                    log("job1 run end")
+                    throw IOException()
+                }.join()
+
+                launch {
+                    delay(1000)
+                    log("job2 run end")
+                }.join()
+
+                launch {
+                    delay(1000)
+                    log("job3 run end")
+                }.join()
+
+                launch {
+                    delay(4000)
+                    log("job4 run end")
+                }.join()
+                log("test18 run end")
+            }
+        }
+    }
+
+    suspend fun test19() {
+        supervisorScope {
+            try {
+                withContext(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->
+                    log("handler a exception $throwable")
+                }) {
+                    throw IllegalArgumentException()
+                }
+                log("test19 end")
+            } catch (e: Exception) {
+                log("catch a exception $e")
+            }
+
+        }
+    }
+
+    fun test20() {
+        GlobalScope.launch {
+            log("start")
+            val coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+                log("coroutineExceptionHandler $throwable")
+            }
+//            try {
+//                launch(coroutineExceptionHandler) {
+//                    throw IOException()
+//                }.join()
+//            } catch (e: Exception) {
+//                log("launch Exception $e")
+//            }
+            try {
+                withContext(Dispatchers.IO) {
+                    throw IllegalArgumentException()
+                }
+            } catch (e: Exception) {
+                log("withContext Exception $e")
+            }
+        }
+    }
+
+    suspend fun test21() {
+        val coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+            log("coroutineExceptionHandler $throwable")
+        }
+        CoroutineScope(SupervisorJob()).launch(coroutineExceptionHandler) {
+            log("start")
+
+            launch (Dispatchers.IO) {
+                log("throw exception")
+                throw IllegalArgumentException()
+            }.join()
+
+            launch {
+
+            }
+        }
+    }
 }
 
 fun main() = runBlocking {
-    test15()
+    test21()
+    delay(30000)
     log("end")
 }

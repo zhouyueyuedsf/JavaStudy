@@ -8,6 +8,17 @@ public class Lock1 {
     public static  ReentrantLock lock = new ReentrantLock();
     public static Condition condition = lock.newCondition();
 
+    public final Object object = new Object();
+    public void test1() {
+        synchronized (object) {
+
+        }
+    }
+
+    public synchronized void test2() {
+
+    }
+
     public static void main(String[] args) throws InterruptedException {
         int j = 0;
 

@@ -17,8 +17,8 @@ public class SingleInstance2 {
 
     private static class SingleInstanceHolder {
         private final static SingleInstance2 instance = new SingleInstance2();
-        private int single = 0;
     }
+
     static  int anInt = 0;
     public static void main(String[] args) {
 
