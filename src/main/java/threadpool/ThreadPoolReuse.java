@@ -23,6 +23,31 @@ public class ThreadPoolReuse {
     public static void main(String[] args) throws InterruptedException {
 //        ScheduledThreadPoolExecutor scheduledPool = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(3);
 
+        test2();
+    }
+
+    private static void test2() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    System.out.println("thread running");
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+        try {
+            Thread.sleep(2000);
+            thread.start();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void test1() {
         ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
         pool.setKeepAliveTime(1, TimeUnit.MICROSECONDS);
         pool.allowCoreThreadTimeOut(true);
