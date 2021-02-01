@@ -10,6 +10,7 @@ import coroutine.Exception.test18
 import coroutine.Exception.test19
 import coroutine.Exception.test20
 import coroutine.Exception.test21
+import coroutine.Exception.test22
 import coroutine.Exception.test8
 import coroutine.Exception.test9_1
 import kotlinx.coroutines.*
@@ -497,7 +498,7 @@ object Exception {
         val coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
             log("coroutineExceptionHandler $throwable")
         }
-        CoroutineScope(SupervisorJob()).launch(coroutineExceptionHandler) {
+        CoroutineScope(Job()).launch(coroutineExceptionHandler) {
             log("start")
 
             launch (Dispatchers.IO) {
@@ -506,14 +507,31 @@ object Exception {
             }.join()
 
             launch {
+                log("123")
+            }.join()
+        }
+    }
 
-            }
+    suspend fun test22() {
+        val coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+            log("coroutineExceptionHandler $throwable")
+        }
+        val scope = CoroutineScope(SupervisorJob())
+        log("start")
+
+        scope.launch (Dispatchers.IO + coroutineExceptionHandler) {
+            log("throw exception")
+            throw IllegalArgumentException()
+        }
+
+        scope.launch {
+            log("123")
         }
     }
 }
 
 fun main() = runBlocking {
-    test21()
-    delay(30000)
+    test22()
+    delay(3000)
     log("end")
 }

@@ -265,6 +265,10 @@ object Cancel {
             }
         }
     }
+
+    suspend fun test8() {
+
+    }
 }
 
 var mCont: CancellableContinuation<String>? = null

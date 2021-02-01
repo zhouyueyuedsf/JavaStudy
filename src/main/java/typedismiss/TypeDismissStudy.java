@@ -42,6 +42,8 @@ public class TypeDismissStudy<T> {
 
     }
 
+
+
     public static void test6() {
         List<Fruit> fruits = new ArrayList<>();
 //        fruits.add(new Fruit());
@@ -50,10 +52,15 @@ public class TypeDismissStudy<T> {
     }
 
     public static void printSum(Collection<?> c) {
+        // c只能是消费者，不能是生产者
+//        c.add(1);
     }
 
     public static void printSum2(Collection<Integer> c) {
+        c.add(1);
     }
+
+
 
     public static void main(String[] args) {
         TypeDismissStudy<String> typeDismissStudy = new TypeDismissStudy<>();
