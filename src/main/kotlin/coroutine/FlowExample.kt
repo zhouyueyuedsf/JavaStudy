@@ -1,18 +1,9 @@
 package coroutine
 
-import coroutine.FlowExample.test1
-import coroutine.FlowExample.test10
-import coroutine.FlowExample.test11
-import coroutine.FlowExample.test2
-import coroutine.FlowExample.test3
-import coroutine.FlowExample.test4
-import coroutine.FlowExample.test6
-import coroutine.FlowExample.test7
-import coroutine.FlowExample.test8
-import coroutine.FlowExample.test9
+import coroutine.FlowExample.test12
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
-import utils.MyLog
 import utils.MyLog.log
 
 object FlowExample {
@@ -77,9 +68,9 @@ object FlowExample {
                 log("$it")
                 it
             }.flowOn(Dispatchers.Default)
-                    .collect {
-                        log("collect $it")
-                    }
+                .collect {
+                    log("collect $it")
+                }
         }
     }
 
@@ -125,21 +116,21 @@ object FlowExample {
 
     suspend fun test9() {
         (1..6).asFlow().take(3)
-                .flatMapConcat {
-                    requestFlow(it)
-                }.collect {
-                    log(it)
-                }
+            .flatMapConcat {
+                requestFlow(it)
+            }.collect {
+                log(it)
+            }
     }
 
     suspend fun test10() {
         (1..6).asFlow().takeWhile {
             it < 3
         }.flatMapConcat {
-                    requestFlow(it)
-                }.collect {
-                    log(it)
-                }
+            requestFlow(it)
+        }.collect {
+            log(it)
+        }
     }
 
     suspend fun test11() {
@@ -151,6 +142,44 @@ object FlowExample {
             log(it)
         }
     }
+
+    private val serverFlow = MutableSharedFlow<Int>(0, 10, BufferOverflow.SUSPEND)
+    private val clientFlow = MutableSharedFlow<Int>(0, 5, BufferOverflow.DROP_OLDEST)
+    suspend fun test12() {
+        GlobalScope.launch(Dispatchers.IO) {
+            (1..10).forEach {
+                // 服务端生产者
+                serverFlow.tryEmit(it).also {
+                    println("tryEmit = $it thread = ${Thread.currentThread()}")
+                }
+            }
+        }
+
+        GlobalScope.launch {
+            // 客户端拿到服务端的flow，作为消费者
+            serverFlow.collect {
+                // 服务端的消费者消费较慢
+                delay(100)
+                println("flow1 $it")
+                // 客户端作为生产者
+                GlobalScope.launch {
+                    clientFlow.tryEmit(it + 10)
+                }
+            }
+        }
+
+        GlobalScope.launch(Dispatchers.IO) {
+            // 服务端拿到客户端的flow，作为消费者
+            clientFlow.collect {
+                delay(500)
+                println("flow2 $it")
+            }
+        }
+
+        delay(5000)
+    }
+
+
 }
 
 @ExperimentalCoroutinesApi
@@ -166,7 +195,8 @@ fun main() = runBlocking {
 ////
 ////    MyLog.log("end")
 
-    test11()
+//    test11()
+    test12()
 
 //    val sequence = test2()
 //    sequence.take(2).forEach { value -> log(value) }

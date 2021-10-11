@@ -7,4 +7,5 @@ public class AddHelper {
         int c = a + b;
         return c;
     }
+
 }

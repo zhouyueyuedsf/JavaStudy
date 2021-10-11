@@ -76,4 +76,15 @@ public class CancellableContinuationImpl implements CancellableContinuation<Obje
     public void resumeWith(@NotNull Object o) {
 
     }
+
+    @Override
+    public void initCancellability() {
+
+    }
+
+    @Nullable
+    @Override
+    public Object tryResume(Object o, @Nullable Object o2, @Nullable Function1<? super Throwable, Unit> function1) {
+        return null;
+    }
 }
