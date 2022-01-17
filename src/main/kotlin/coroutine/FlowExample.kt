@@ -1,10 +1,15 @@
 package coroutine
 
 import coroutine.FlowExample.test12
+import coroutine.FlowExample.test13
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import utils.MyLog.log
+import java.text.DateFormat
+import java.time.Instant
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 object FlowExample {
 
@@ -143,14 +148,15 @@ object FlowExample {
         }
     }
 
-    private val serverFlow = MutableSharedFlow<Int>(0, 10, BufferOverflow.SUSPEND)
+    private val serverFlow = MutableSharedFlow<Int>(0, 1, BufferOverflow.SUSPEND)
     private val clientFlow = MutableSharedFlow<Int>(0, 5, BufferOverflow.DROP_OLDEST)
     suspend fun test12() {
         GlobalScope.launch(Dispatchers.IO) {
-            (1..10).forEach {
+            (1..10).forEach { value ->
                 // 服务端生产者
-                serverFlow.tryEmit(it).also {
-                    println("tryEmit = $it thread = ${Thread.currentThread()}")
+                log("server emit index = $value")
+                serverFlow.emit(value).also {
+                    log("server emit = $value")
                 }
             }
         }
@@ -158,9 +164,9 @@ object FlowExample {
         GlobalScope.launch {
             // 客户端拿到服务端的flow，作为消费者
             serverFlow.collect {
-                // 服务端的消费者消费较慢
-                delay(100)
-                println("flow1 $it")
+                // 服务端的消费者即客户端消费较慢
+                delay(1_000)
+                log("client collect $it")
                 // 客户端作为生产者
                 GlobalScope.launch {
                     clientFlow.tryEmit(it + 10)
@@ -176,10 +182,28 @@ object FlowExample {
             }
         }
 
-        delay(5000)
+        delay(50_000)
     }
 
 
+    suspend fun test13() {
+        GlobalScope.launch {
+            (1 .. 10).forEach {
+                log("test13_suspend invoke index $it")
+                test13_suspend()
+            }
+            log("test13_suspend invoke")
+        }
+        delay(5_000)
+    }
+
+    suspend fun test13_suspend() = suspendCancellableCoroutine<Unit> {
+        val i = 1 + 1
+    }
+
+    fun test14() {
+
+    }
 }
 
 @ExperimentalCoroutinesApi
@@ -197,6 +221,8 @@ fun main() = runBlocking {
 
 //    test11()
     test12()
+
+//    test13()
 
 //    val sequence = test2()
 //    sequence.take(2).forEach { value -> log(value) }

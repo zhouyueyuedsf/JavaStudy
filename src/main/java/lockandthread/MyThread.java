@@ -1,8 +1,29 @@
-package thread;
+package lockandthread;
+
+import utils.MyLog;
+
+import java.util.function.Supplier;
 
 public class MyThread extends Thread {
+
+    static class TL1 {
+        public static TL1 tl1 = new TL1();
+        Session logThread = new Session();
+        ThreadLocal<Session> sessions = ThreadLocal.withInitial(Session::new);
+
+        public void test() {
+            MyLog.INSTANCE.log("start access logThread " + logThread);
+            MyLog.INSTANCE.log("start access sessions " + sessions.get());
+        }
+    }
+
+    static class Session {
+
+    }
+
     @Override
     public void run() {
+        TL1.tl1.test();
         super.run();
         try {
             for (int i = 0; i < 500000; i++) {

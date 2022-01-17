@@ -1,4 +1,4 @@
-package thread;
+package lockandthread;
 
 public class NullThreadTest {
     private static String[] strings = {"1", "2", "3"};

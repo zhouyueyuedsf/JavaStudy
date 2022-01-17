@@ -58,6 +58,14 @@ public class RunPlan {
         System.out.println("ex");
     }
 
+    public static void test4() {
+        try {
+            throw new VerifyError("test4");
+        } catch (Throwable e) {
+            System.out.println("error" + e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
 //        try {
 //            inc();
@@ -66,5 +74,7 @@ public class RunPlan {
 //        }
 
         test3();
+
+        test4();
     }
 }
