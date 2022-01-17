@@ -1,5 +1,8 @@
 package typedismiss
 
+import typedismiss.TypeDismissStudy.Apple
+import typedismiss.TypeDismissStudy.Fruit
+import java.util.ArrayList
 import com.sun.org.apache.xpath.internal.functions.FunctionDef1Arg
 
 

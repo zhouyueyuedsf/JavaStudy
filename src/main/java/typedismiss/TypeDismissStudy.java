@@ -51,6 +51,10 @@ public class TypeDismissStudy<T> {
         fruits.add(new Melon());
     }
 
+    public static void test7() {
+//        List<Fruit> fruits = new ArrayList<Apple>();
+    }
+
     public static void printSum(Collection<?> c) {
         // c只能是消费者，不能是生产者
 //        c.add(1);
