@@ -2,6 +2,7 @@ package coroutine
 
 import coroutine.FlowExample.test12
 import coroutine.FlowExample.test13
+import coroutine.FlowExample.test14
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -201,8 +202,18 @@ object FlowExample {
         val i = 1 + 1
     }
 
-    fun test14() {
+    suspend fun test14() {
+        (1..6).asFlow().onStart {
+            log("onStart")
+        }.onEach {
+            throw java.lang.NullPointerException()
+        }.catch {
 
+        }.onCompletion {
+            log("onCompletion")
+        }.collect {
+
+        }
     }
 }
 
@@ -220,7 +231,7 @@ fun main() = runBlocking {
 ////    MyLog.log("end")
 
 //    test11()
-    test12()
+    test14()
 
 //    test13()
 
