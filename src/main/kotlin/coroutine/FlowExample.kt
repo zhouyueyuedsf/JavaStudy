@@ -1,5 +1,7 @@
 package coroutine
 
+import coroutine.FlowExample.test12
+import coroutine.FlowExample.test13
 import coroutine.FlowExample.test14
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -222,6 +224,20 @@ object FlowExample {
 
     suspend fun test13_suspend() = suspendCancellableCoroutine<Unit> {
         val i = 1 + 1
+    }
+
+    suspend fun test14() {
+        (1..6).asFlow().onStart {
+            log("onStart")
+        }.onEach {
+            throw java.lang.NullPointerException()
+        }.catch {
+
+        }.onCompletion {
+            log("onCompletion")
+        }.collect {
+
+        }
     }
 }
 

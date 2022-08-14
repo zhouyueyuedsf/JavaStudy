@@ -77,7 +77,7 @@ inline fun <reified T> TreeNode.findParentOfType(): T? {
 }
 
 class MyTreeNode : TreeNode {
-    override fun children(): Enumeration<*> {
+    override fun children(): Enumeration<out TreeNode>? {
         TODO("Not yet implemented")
     }
 
