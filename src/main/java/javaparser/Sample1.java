@@ -22,5 +22,26 @@ public class Sample1 {
         for (ImportDeclaration importDeclaration : importDeclarations) {
             System.out.println("nameAsString = " + importDeclaration.getNameAsString() + " id = " + importDeclaration.getName().getIdentifier() + " Qualifier = " + importDeclaration.getName().getQualifier().get());
         }
+
+        for (ImportDeclaration importDeclaration : importDeclarations) {
+            String tryPath = convertFilePath(importDeclaration);
+            File tryFile = new File(root + "/src/main/java/" + tryPath);
+            System.out.println("convertFilePath(importDeclaration)" + tryPath);
+            if (tryFile.exists()) {
+                System.out.println("yes");
+            }
+        }
+    }
+
+    private static String convertFilePath(ImportDeclaration importDeclaration) {
+        String importStr = importDeclaration.getNameAsString();
+        String[] pathSegs = importStr.split("\\.");
+        StringBuilder tryPathBuilder = new StringBuilder();
+        for (int i = 0; i < pathSegs.length - 1; i++) {
+            tryPathBuilder.append(pathSegs[i]).append("/");
+        }
+        tryPathBuilder.append(pathSegs[pathSegs.length - 1]).append(".java");
+        String tryPath = tryPathBuilder.toString();
+        return tryPath;
     }
 }

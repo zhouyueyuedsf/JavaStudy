@@ -1,15 +1,10 @@
 package coroutine
 
-import coroutine.FlowExample.test12
-import coroutine.FlowExample.test13
+import coroutine.FlowExample.test14
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import utils.MyLog.log
-import java.text.DateFormat
-import java.time.Instant
-import java.time.format.DateTimeFormatter
-import java.util.*
 
 object FlowExample {
 
@@ -185,10 +180,38 @@ object FlowExample {
         delay(50_000)
     }
 
+    private val refreshSignal = MutableSharedFlow<Unit>()
+
+    private val loadDataSignal: Flow<Unit> = flow {
+        emitAll(refreshSignal)
+//        refreshSignal.collect {
+//            log("test14 refreshSignal.collect ")
+//            emit(Unit)
+//        }
+    }
+    private var transform = 2
+    val testStateFlow = loadDataSignal.transform { _ ->
+        log("test14 mit($transform * 100)")
+        emit(transform++ * 100)
+    }.stateIn(GlobalScope, SharingStarted.Lazily, 0)
+
+    suspend fun test14() {
+        GlobalScope.launch {
+            delay(1000)
+            log("test14 emit 2")
+            refreshSignal.emit(Unit)
+            log("test14 emit 2")
+            refreshSignal.emit(Unit)
+        }
+
+        testStateFlow.collect {
+            log("collect $it")
+        }
+    }
 
     suspend fun test13() {
         GlobalScope.launch {
-            (1 .. 10).forEach {
+            (1..10).forEach {
                 log("test13_suspend invoke index $it")
                 test13_suspend()
             }
@@ -199,10 +222,6 @@ object FlowExample {
 
     suspend fun test13_suspend() = suspendCancellableCoroutine<Unit> {
         val i = 1 + 1
-    }
-
-    fun test14() {
-
     }
 }
 
@@ -220,7 +239,7 @@ fun main() = runBlocking {
 ////    MyLog.log("end")
 
 //    test11()
-    test12()
+    test14()
 
 //    test13()
 

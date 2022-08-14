@@ -1,8 +1,4 @@
-import candy.NullTestKt;
 import keys.Final1;
-import kotlin.jvm.functions.Function2;
-import lambda.LambdaDemoKt;
-
 import java.util.ArrayList;
 import java.util.List;
 
